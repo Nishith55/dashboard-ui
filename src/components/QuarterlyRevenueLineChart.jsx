@@ -1,0 +1,103 @@
+import React, { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  Line,
+  ResponsiveContainer
+} from 'recharts';
+import {
+  Card,
+  CardContent,
+  Typography,
+  CircularProgress,
+  Box
+} from '@mui/material';
+
+const QuarterlyRevenueBarChart = ({ filename }) => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/json/${filename}`);
+        const jsonData = await res.json();
+
+        const parsed = jsonData.map(item => ({
+          customer: item["Customer Name"],
+          q3: item["Quarter 3 Revenue"],
+          q4: item["Quarter 4 Revenue"],
+          variancePercent: item["Percentage of Variance"]
+        }));
+
+        setData(parsed.slice(0, 20)); // Top 20 customers
+      } catch (err) {
+        console.error("Error fetching or parsing data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [filename]);
+
+  return (
+    <Card sx={{ marginBottom: 4, boxShadow: 3 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom align="center">
+          Quarterly Revenue & QoQ Growth (Top 20 Customers)
+        </Typography>
+
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+            <CircularProgress />
+          </Box>
+        ) : data.length > 0 ? (
+          <Box height={500}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data}
+                margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="customer"
+                  angle={-30}
+                  textAnchor="end"
+                  interval={0}
+                  height={100}
+                />
+                <YAxis yAxisId="left" stroke="#1976d2" />
+                <YAxis yAxisId="right" orientation="right" stroke="#ff9800" />
+                <Tooltip />
+                <Legend />
+                <Bar yAxisId="left" dataKey="q3" fill="#1976d2" name="Q3 Revenue" />
+                <Bar yAxisId="left" dataKey="q4" fill="#4caf50" name="Q4 Revenue" />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="variancePercent"
+                  stroke="#ff9800"
+                  name="% Variance (QoQ)"
+                  dot={false}
+                  strokeWidth={2}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
+        ) : (
+          <Typography align="center" color="text.secondary">
+            No data available.
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default QuarterlyRevenueBarChart;
