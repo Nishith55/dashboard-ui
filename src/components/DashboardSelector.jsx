@@ -1,4 +1,3 @@
-// export default DashboardSelector;
 import React from 'react';
 import {
   FormControl,
@@ -8,30 +7,7 @@ import {
   Box
 } from '@mui/material';
 
-const dashboards = [
-  {
-    id: "A._Quarterly_Revenue_and_QoQ_growth",
-    label: "Quarterly Revenue & QoQ Growth"
-  },
-  {
-    id: "B._Revenue_Bridge_and_Churned_Analysis",
-    label: "Revenue Bridge & Churned Analysis"
-  },
-  {
-    id: "C._Country_wise_Revenue_Analysis",
-    label: "Country-wise Revenue"
-  },
-  {
-    id: "D._Region_wise_Revenue_Analysis",
-    label: "Region-wise Revenue"
-  },
-  {
-    id: "E._Customer_Concentration_Analysis",
-    label: "Customer Concentration"
-  }
-];
-
-function DashboardSelector({ onSelect }) {
+function DashboardSelector({ onSelect, options }) {
   const handleChange = (event) => {
     onSelect(event.target.value);
   };
@@ -46,9 +22,9 @@ function DashboardSelector({ onSelect }) {
           defaultValue=""
           onChange={handleChange}
         >
-          {dashboards.map(({ id, label }) => (
-            <MenuItem key={id} value={id}>
-              {label}
+          {options.map((filename) => (
+            <MenuItem key={filename} value={filename}>
+              {filename.replace(/_/g, ' ').replace(/\./g, '')}
             </MenuItem>
           ))}
         </Select>
