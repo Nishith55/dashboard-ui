@@ -141,6 +141,7 @@ function App() {
         ) : (
           <Box display="flex" justifyContent="center">
             <DashboardSelector
+              value={dashboardName}
               onSelect={setDashboardName}
               options={availableDashboards}
             />

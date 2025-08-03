@@ -7,7 +7,7 @@ import {
   Box
 } from '@mui/material';
 
-function DashboardSelector({ onSelect, options }) {
+function DashboardSelector({ value, onSelect, options }) {
   const handleChange = (event) => {
     onSelect(event.target.value);
   };
@@ -19,8 +19,9 @@ function DashboardSelector({ onSelect, options }) {
         <Select
           labelId="dashboard-select-label"
           id="dashboard-select"
-          defaultValue=""
+          value={value}
           onChange={handleChange}
+          label="Select Dashboard"
         >
           {options.map((filename) => (
             <MenuItem key={filename} value={filename}>
