@@ -1,23 +1,101 @@
+// // export default App;
+
+// import React, { useState } from 'react';
+// import {
+//   Container,
+//   Typography,
+//   Box,
+//   Divider,
+//   Paper
+// } from '@mui/material';
+
+// import DashboardSelector from "./components/DashboardSelector";
+// import QuarterlyRevenueLineChart from "./components/QuarterlyRevenueLineChart";
+// import RevenueBridgeChart from "./components/RevenueBridgeWaterfallChart";
+// import CountryRevenuePieChart from "./components/CountryRevenuePieChart";
+// import RegionRevenueChart from "./components/RegionRevenueBarChart";
+// import CustomerConcentrationChart from "./components/CustomerConcentrationChart";
+
+// function App() {
+//   const [dashboardName, setDashboardName] = useState('');
+
+//   const renderDashboard = () => {
+//     switch (dashboardName) {
+//       case "A._Quarterly_Revenue_and_QoQ_growth":
+//         return <QuarterlyRevenueLineChart filename={dashboardName} />;
+//       case "B._Revenue_Bridge_and_Churned_Analysis":
+//         return <RevenueBridgeChart filename={dashboardName} />;
+//       case "C._Country_wise_Revenue_Analysis":
+//         return <CountryRevenuePieChart filename={dashboardName} />;
+//       case "D._Region_wise_Revenue_Analysis":
+//         return <RegionRevenueChart filename={dashboardName} />;
+//       case "E._Customer_Concentration_Analysis":
+//         return <CustomerConcentrationChart filename={dashboardName} />;
+//       default:
+//         return (
+//           <Typography align="center" color="text.secondary" mt={4}>
+//             Please select a dashboard from the dropdown above.
+//           </Typography>
+//         );
+//     }
+//   };
+
+//   return (
+//     <Container maxWidth="lg" sx={{ py: 4 }}>
+//       <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+//         <Typography variant="h4" align="center" gutterBottom>
+//           Business Intelligence Dashboard
+//         </Typography>
+//         <Divider sx={{ my: 2 }} />
+//         <Box display="flex" justifyContent="center">
+//           <DashboardSelector onSelect={setDashboardName} />
+//         </Box>
+//       </Paper>
+
+//       {dashboardName && (
+//         <Typography variant="h6" align="center" sx={{ mb: 2 }}>
+//           Showing: {dashboardName.replace(/_/g, ' ')}
+//         </Typography>
+//       )}
+
+//       {renderDashboard()}
+//     </Container>
+//   );
+// }
+
 // export default App;
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
   Box,
   Divider,
-  Paper
+  Paper,
+  CircularProgress,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 
-import DashboardSelector from "./components/DashboardSelector";
 import QuarterlyRevenueLineChart from "./components/QuarterlyRevenueLineChart";
 import RevenueBridgeChart from "./components/RevenueBridgeWaterfallChart";
 import CountryRevenuePieChart from "./components/CountryRevenuePieChart";
 import RegionRevenueChart from "./components/RegionRevenueBarChart";
 import CustomerConcentrationChart from "./components/CustomerConcentrationChart";
 
+const availableDashboards = [
+  "A._Quarterly_Revenue_and_QoQ_growth",
+  "B._Revenue_Bridge_and_Churned_Analysis",
+  "C._Country_wise_Revenue_Analysis",
+  "D._Region_wise_Revenue_Analysis",
+  "E._Customer_Concentration_Analysis"
+];
+
 function App() {
   const [dashboardName, setDashboardName] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const renderDashboard = () => {
     switch (dashboardName) {
@@ -48,23 +126,41 @@ function App() {
         </Typography>
         <Divider sx={{ my: 2 }} />
         <Box display="flex" justifyContent="center">
-          <DashboardSelector onSelect={setDashboardName} />
+          <FormControl sx={{ minWidth: 300 }}>
+            <InputLabel>Select Dashboard</InputLabel>
+            <Select
+              value={dashboardName}
+              onChange={(e) => setDashboardName(e.target.value)}
+              label="Select Dashboard"
+            >
+              {availableDashboards.map((dash) => (
+                <MenuItem key={dash} value={dash}>
+                  {dash.replace(/_/g, ' ').replace(/\./g, '')}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
       </Paper>
 
       {dashboardName && (
         <Typography variant="h6" align="center" sx={{ mb: 2 }}>
-          Showing: {dashboardName.replace(/_/g, ' ')}
+          Showing: {dashboardName.replace(/_/g, ' ').replace(/\./g, '')}
         </Typography>
       )}
 
-      {renderDashboard()}
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        renderDashboard()
+      )}
     </Container>
   );
 }
 
 export default App;
-
 
 
 

@@ -26,6 +26,7 @@ const RevenueBridgeChart = ({ filename }) => {
       try {
         // const res = await fetch(`http://localhost:8080/api/json/${filename}`);
         const res = await fetch(`https://dashboard-backend-1-4ipw.onrender.com/api/json/${filename}`);
+        // const res = await fetch(`https://dashboard-jsons-file.s3.eu-north-1.amazonaws.com/${filename}.json`);
 
         const json = await res.json();
         const topCustomers = json.slice(0, 20); // limit for performance

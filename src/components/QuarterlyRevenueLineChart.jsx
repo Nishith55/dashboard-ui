@@ -26,6 +26,7 @@ const QuarterlyRevenueBarChart = ({ filename }) => {
     const fetchData = async () => {
       try {
         const res = await fetch(`https://dashboard-backend-1-4ipw.onrender.com/api/json/${filename}`);
+        // const res = await fetch(`https://dashboard-jsons-file.s3.eu-north-1.amazonaws.com/${filename}.json`);
         const jsonData = await res.json();
 
         const parsed = jsonData.map(item => ({
