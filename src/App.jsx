@@ -1,12 +1,12 @@
 // // export default App;
-
-// import React, { useState } from 'react';
+// import React, { useEffect, useState } from 'react';
 // import {
 //   Container,
 //   Typography,
 //   Box,
 //   Divider,
-//   Paper
+//   Paper,
+//   CircularProgress
 // } from '@mui/material';
 
 // import DashboardSelector from "./components/DashboardSelector";
@@ -15,9 +15,29 @@
 // import CountryRevenuePieChart from "./components/CountryRevenuePieChart";
 // import RegionRevenueChart from "./components/RegionRevenueBarChart";
 // import CustomerConcentrationChart from "./components/CustomerConcentrationChart";
+// import AutoChartRenderer from "./components/AutoChartRenderer"; // 🆕
 
 // function App() {
 //   const [dashboardName, setDashboardName] = useState('');
+//   const [availableDashboards, setAvailableDashboards] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     // Fetch available filenames from backend (which reads from S3)
+//     const fetchDashboardList = async () => {
+//       try {
+//         const res = await fetch('https://dashboard-backend-1-4ipw.onrender.com/api/json/files');
+//         const files = await res.json();
+//         setAvailableDashboards(files);
+//       } catch (error) {
+//         console.error("Error loading dashboard list:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchDashboardList();
+//   }, []);
 
 //   const renderDashboard = () => {
 //     switch (dashboardName) {
@@ -32,7 +52,9 @@
 //       case "E._Customer_Concentration_Analysis":
 //         return <CustomerConcentrationChart filename={dashboardName} />;
 //       default:
-//         return (
+//         return dashboardName ? (
+//           <AutoChartRenderer filename={dashboardName} />
+//         ) : (
 //           <Typography align="center" color="text.secondary" mt={4}>
 //             Please select a dashboard from the dropdown above.
 //           </Typography>
@@ -47,14 +69,24 @@
 //           Business Intelligence Dashboard
 //         </Typography>
 //         <Divider sx={{ my: 2 }} />
-//         <Box display="flex" justifyContent="center">
-//           <DashboardSelector onSelect={setDashboardName} />
-//         </Box>
+//         {loading ? (
+//           <Box display="flex" justifyContent="center" mt={2}>
+//             <CircularProgress />
+//           </Box>
+//         ) : (
+//           <Box display="flex" justifyContent="center">
+//             <DashboardSelector
+//               value={dashboardName}
+//               onSelect={setDashboardName}
+//               options={availableDashboards}
+//             />
+//           </Box>
+//         )}
 //       </Paper>
 
 //       {dashboardName && (
 //         <Typography variant="h6" align="center" sx={{ mb: 2 }}>
-//           Showing: {dashboardName.replace(/_/g, ' ')}
+//           Showing: {dashboardName.replace(/_/g, ' ').replace(/\./g, '')}
 //         </Typography>
 //       )}
 
@@ -64,6 +96,8 @@
 // }
 
 // export default App;
+
+
 import React, { useEffect, useState } from 'react';
 import {
   Container,
@@ -81,6 +115,7 @@ import CountryRevenuePieChart from "./components/CountryRevenuePieChart";
 import RegionRevenueChart from "./components/RegionRevenueBarChart";
 import CustomerConcentrationChart from "./components/CustomerConcentrationChart";
 import AutoChartRenderer from "./components/AutoChartRenderer"; // 🆕
+import ChatAssistant from "./components/ChatAssistant"; // 🧠
 
 function App() {
   const [dashboardName, setDashboardName] = useState('');
@@ -88,14 +123,20 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch available filenames from backend (which reads from S3)
     const fetchDashboardList = async () => {
       try {
         const res = await fetch('https://dashboard-backend-1-4ipw.onrender.com/api/json/files');
         const files = await res.json();
-        setAvailableDashboards(files);
+        console.log("Fetched dashboards:", files); // ✅ Debug fetched list
+        if (Array.isArray(files)) {
+          setAvailableDashboards(files);
+        } else {
+          console.error("Expected array of filenames, got:", files);
+          setAvailableDashboards([]);
+        }
       } catch (error) {
         console.error("Error loading dashboard list:", error);
+        setAvailableDashboards([]);
       } finally {
         setLoading(false);
       }
@@ -138,7 +179,7 @@ function App() {
           <Box display="flex" justifyContent="center" mt={2}>
             <CircularProgress />
           </Box>
-        ) : (
+        ) : availableDashboards.length > 0 ? (
           <Box display="flex" justifyContent="center">
             <DashboardSelector
               value={dashboardName}
@@ -146,6 +187,10 @@ function App() {
               options={availableDashboards}
             />
           </Box>
+        ) : (
+          <Typography align="center" color="error">
+            No dashboards available to select.
+          </Typography>
         )}
       </Paper>
 
@@ -156,12 +201,13 @@ function App() {
       )}
 
       {renderDashboard()}
+
+      {dashboardName && <ChatAssistant filename={dashboardName} />} {/* 🧠 Chat below charts */}
     </Container>
   );
 }
 
 export default App;
-
 
 
 
